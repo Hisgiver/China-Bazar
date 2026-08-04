@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout | China Bazar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>tailwind.config = { theme: { extend: { colors: { primary: '#064e3b' } } } }</script>
+</head>
+<body class="bg-gray-50 p-4">
+    <div class="max-w-xl mx-auto bg-white p-8 rounded-3xl shadow-lg">
+        <h2 class="text-2xl font-bold mb-6">Delivery Details (Cash on Delivery)</h2>
+        <form id="orderForm" class="space-y-4">
+            <input type="text" id="name" placeholder="Full Name" class="w-full p-4 bg-gray-100 rounded-xl outline-none border-none" required>
+            <input type="text" id="phone" placeholder="Phone Number" class="w-full p-4 bg-gray-100 rounded-xl outline-none border-none" required>
+            <textarea id="address" placeholder="Full Address in Bangladesh" class="w-full p-4 bg-gray-100 rounded-xl outline-none border-none" required></textarea>
+            <div class="bg-gray-50 p-4 rounded-xl border border-dashed border-primary">
+                <p class="flex justify-between font-bold"><span>Total to Pay:</span><span id="finalTotal">৳ 0</span></p>
+                <p class="text-xs text-gray-500 mt-2">* ৳ 60 Delivery charge added</p>
+            </div>
+            <button type="submit" class="w-full bg-primary text-white py-4 rounded-xl font-bold text-lg">Confirm Order</button>
+        </form>
+    </div>
+    <script src="app.js"></script>
+    <script>
+        document.getElementById('finalTotal').innerText = `৳ ${parseInt(localStorage.getItem('cart-total') || 0) + 60}`;
+        document.getElementById('orderForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const orderData = {
+                customer_id: null, // Logic for logged in users goes here
+                total_amount: parseInt(localStorage.getItem('cart-total') || 0) + 60,
+                shipping_address: { name: document.getElementById('name').value, phone: document.getElementById('phone').value, address: document.getElementById('address').value },
+                status: 'pending'
+            };
+            const { data, error } = await supabase.from('orders').insert([orderData]).select();
+            if(!error) {
+                alert('Order Placed Successfully!');
+                localStorage.removeItem('cb-cart');
+                window.location.href = 'index.html';
+            }
+        };
+    </script>
+</body>
+</html>
